@@ -25,8 +25,8 @@ When the vehicle is moving a low speeds, the kinematic model are pretty accurate
 
 This model uses the previous timestep to calculate the current state of the vehicle
 
-The model used is described on these equations:
-![EQS]
+The model used is described on these equations:   
+![EQS]  
 
 Where :
  - `x` is the longitudinal position of the vehicle
@@ -45,11 +45,9 @@ Where :
 
 The time step lenght and elapsed duration define the time horizon and its granularity. The shorter the time horizon the more responsive (but also more aggresive) the controller is. Longer time horizons generate a smoother behaviour but may fall short when quick actions are required. In short, it is a tradeoff between reacting to the current curvature of the road and looking ahead to plan an ideal path. Having a longer time horizon will also be computationally more expensive.
 
-Because of this (and partly due to the indications given during Udacity office hours ) I chose the following values
-`N = 10`
-`dt = 0.1`
+Because of this (and partly due to the indications given during Udacity office hours), I chose the following values: `N = 10, dt = 0.1`
 
-They work pretty well up to medium speeds (~40mph) but if the speed is increased we need to increase the value of `N` too (too be able to plan better)
+They work pretty well up to medium speeds (~40mph) but if the speed is increased we need to increase the value of `N` too (too be able to plan further away in the future)
 
 
 #### Polynomial Fitting and MPC Preprocessing
