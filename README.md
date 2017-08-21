@@ -1,6 +1,68 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+[MAIN]: ./imgs/main_pic.png
+[EQS]: ./imgs/kin_model_eqs.png
+
+
+[![IMAGE ALT TEXT](./imgs/main_pic.png)](https://youtu.be/gYLFAwzJcTQ "MPC video")
+**Click on the image to go to the youtube video**
+
+
+
+---
+
+## Reflection
+
+#### Introduction
+
+In this project, we learned how to use a model predictive controller to steer the vehicle around the circuit. This approach has multiple advantages over using a simple PID controller, for example, instead of being a 'reactive' controller, in this case, the controller is able to look ahead in the future (time horizon) to see if a curve is coming and calculate a more adequate way of taking it. Other examples are the inclusion of a kinematic model that describes the car and the constraints that it has (non-holonomic vehicle).
+
+#### The Model
+The kinematic model used in this project is based on a bicycle. Because the model is not dynamic, it neglets all the forces acting on the car such as road and tyre friction and inertias.
+
+When the vehicle is moving a low speeds, the kinematic model are pretty accurate, but at higher speeds they are unable to represent the system properly due to the increased importance of the dynamics.
+
+This model uses the previous timestep to calculate the current state of the vehicle
+
+The model used is described on these equations:
+![EQS]
+
+Where :
+ - `x` is the longitudinal position of the vehicle
+ - `y` is the lateral position of the vehicle
+ - `Ψ` (psi) is the heading direction of the vehicle
+ - `v` is the velocity of the car
+ - `Lf` is the distance beween the front of the vehicle and its center of gravity
+ - `𝛿` is the steering angle in radians (actuator)
+ - `a` is the acceleration (actuator)
+ - `dt` is the time step
+
+
+
+
+#### Timestep Length and Elapsed Duration (N & dt)
+
+The time step lenght and elapsed duration define the time horizon and its granularity. The shorter the time horizon the more responsive (but also more aggresive) the controller is. Longer time horizons generate a smoother behaviour but may fall short when quick actions are required. In short, it is a tradeoff between reacting to the current curvature of the road and looking ahead to plan an ideal path. Having a longer time horizon will also be computationally more expensive.
+
+Because of this (and partly due to the indications given during Udacity office hours ) I chose the following values
+`N = 10`
+`dt = 0.1`
+
+They work pretty well up to medium speeds (~40mph) but if the speed is increased we need to increase the value of `N` too (too be able to plan better)
+
+
+#### Polynomial Fitting and MPC Preprocessing
+
+In order to do a polynomial fitting we need to transform the waypoints into the vehicle coordinate system. Once I did that, the origin of the coordinate system coincides with the car and makes easier the process of curve fitting. Finally, I fitted a third order polynomial into the waypoints positions.
+
+
+#### Model Predictive Control with Latency
+
+Latency presents an issue since the controller will be working continously with "old" data, this can cause the controller to oscillate and erratic vehicle behaviour.
+In order to account for the 100ms latency, I changed the equations as it can be seen in MPC.cpp (lines 116 - 120).
+
+
 ---
 
 ## Dependencies
@@ -19,7 +81,7 @@ Self-Driving Car Engineer Nanodegree Program
   * Run either `install-mac.sh` or `install-ubuntu.sh`.
   * If you install from source, checkout to commit `e94b6e1`, i.e.
     ```
-    git clone https://github.com/uWebSockets/uWebSockets 
+    git clone https://github.com/uWebSockets/uWebSockets
     cd uWebSockets
     git checkout e94b6e1
     ```
@@ -42,7 +104,7 @@ Self-Driving Car Engineer Nanodegree Program
        per this [forum post](https://discussions.udacity.com/t/incorrect-checksum-for-freed-object/313433/19).
   * Linux
     * You will need a version of Ipopt 3.12.1 or higher. The version available through `apt-get` is 3.11.x. If you can get that version to work great but if not there's a script `install_ipopt.sh` that will install Ipopt. You just need to download the source from the Ipopt [releases page](https://www.coin-or.org/download/source/Ipopt/) or the [Github releases](https://github.com/coin-or/Ipopt/releases) page.
-    * Then call `install_ipopt.sh` with the source directory as the first argument, ex: `sudo bash install_ipopt.sh Ipopt-3.12.1`. 
+    * Then call `install_ipopt.sh` with the source directory as the first argument, ex: `sudo bash install_ipopt.sh Ipopt-3.12.1`.
   * Windows: TODO. If you can use the Linux subsystem and follow the Linux instructions.
 * [CppAD](https://www.coin-or.org/CppAD/)
   * Mac: `brew install cppad`
